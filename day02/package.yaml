@@ -35,7 +35,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - day02
-
+    
 tests:
   day02-test:
     main:                Spec.hs
