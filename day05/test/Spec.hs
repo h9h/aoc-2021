@@ -1,9 +1,10 @@
 import Control.Exception (evaluate)
-import Test.Hspec
 import Test.QuickCheck
 
+import Data.Set (fromList)
+
 import Lib (isAlongAxis, getPoints, parse, getDangerousPoints, isAlongAxis)
-import Test.Hspec (describe)
+import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
@@ -25,3 +26,8 @@ main = hspec $ do
   describe "Test 1" $ do
     it "should get testanswer" $ do
       length (getDangerousPoints isAlongAxis $ parse $ lines testinput) `shouldBe` 5
+  describe "QuickCheck" $ do
+    it "set of getPoints should be invariant to direction of Segment" $ do
+      property prop_LengthInvariantToDirection
+
+prop_LengthInvariantToDirection ((x1,y1), (x2,y2)) = fromList (getPoints ((x1,y1), (x2,y2))) == fromList (getPoints ((x2,y2), (x1,y1)))
