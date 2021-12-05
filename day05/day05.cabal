@@ -32,6 +32,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , split
   default-language: Haskell2010
 
 executable day05-exe
@@ -44,6 +45,7 @@ executable day05-exe
   build-depends:
       base >=4.7 && <5
     , day05
+    , split
   default-language: Haskell2010
 
 test-suite day05-test
@@ -61,4 +63,5 @@ test-suite day05-test
     , day05
     , hspec
     , hspec-contrib
+    , split
   default-language: Haskell2010

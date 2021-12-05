@@ -1,9 +1,14 @@
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TupleSections #-}
 module Lib where
 
 import Data.Function ( on )
 import Control.Arrow ( Arrow((&&&)) )
 import Data.List ( group, sort, sortOn, sortBy )
+import Data.List.Split (wordsBy)
 import Data.Ord ( comparing, Down(..) )
+import Data.Char (isDigit)
+import Data.Bool (bool)
 
 type Coordinate = (Int, Int)
 type Segment = (Coordinate, Coordinate)
@@ -21,17 +26,16 @@ day05 = do
 -- Parse Input
 --
 
+{-
+>>> parseLine "35,968 -> 974,29"
+((35,968),(974,29))
+-}
 parseLine :: String -> Segment
-parseLine = makeSegment . map (read::String->Int) . words . map cleanInput
+parseLine = makeSegment . map (read @Int) . wordsBy (not . isDigit)
     where
         makeSegment :: [Int] -> Segment
         makeSegment [a,b,c,d] = ((a,b), (c,d))
         makeSegment _ = error "Invalid input for segment"
-        cleanInput :: Char -> Char
-        cleanInput ',' = ' '
-        cleanInput '-' = ' '
-        cleanInput '>' = ' '
-        cleanInput c = c
 
 parse :: [String] -> [Segment]
 parse = map parseLine
@@ -42,24 +46,34 @@ parse = map parseLine
 isAlongAxis :: Segment -> Bool
 isAlongAxis ((x1,y1), (x2,y2)) = x1 == x2 || y1 == y2
 
+{-
+>>> isAlongAxisOrDiagonal ((1,2), (3,4))
+True
+-}
 isAlongAxisOrDiagonal :: Segment -> Bool
-isAlongAxisOrDiagonal ((x1,y1), (x2,y2)) = x1 == x2 || y1 == y2 || abs (x1-x2) == abs (y1-y2)
+isAlongAxisOrDiagonal s@((x1,y1), (x2,y2)) = isAlongAxis s || abs (x1-x2) == abs (y1-y2)
 
+{-
+>>> getPoints ((1,2), (3,4))
+[(1,2),(2,3),(3,4)]
+-}
 getPoints :: Segment -> [Coordinate]
 getPoints ((x1,y1), (x2,y2))
-  | x1 == x2 = zip (repeat x1) $ between y1 y2
-  | y1 == y2 = zip (between x1 x2) (repeat y1)
-  | abs (x1-x2) == abs (y1-y2) = zip (between x1 x2) (between y1 y2)
+  | x1 == x2 = (x1,) <$> range y1 y2
+  | y1 == y2 = (,y1) <$> range x1 x2
+  | abs (x1-x2) == abs (y1-y2) = zip (range x1 x2) (range y1 y2)
   | otherwise = []
-  where 
-      between :: Int -> Int -> [Int]
-      between a b
-        | a <= b = [a..b]
-        | otherwise = reverse [b..a]
+  where
+      range :: Int -> Int -> [Int]
+      range a b = bool [a, a-1..b] [a..b] (a < b)
 
 getAllPoints :: [Segment] -> [Coordinate]
 getAllPoints = concatMap getPoints
 
+{-
+>>> frequency [(1,2), (1,2), (2,3)]
+[(2,(1,2)),(1,(2,3))]
+-}
 frequency :: [Coordinate] -> [(Int,Coordinate)]
 frequency = map (length &&& head) . group . sort
 
