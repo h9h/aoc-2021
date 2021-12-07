@@ -33,14 +33,8 @@ dist y x = abs $ y - x
 deltaY :: Int -> [Int] -> Int
 deltaY y = sum <$> map (dist y)
 
-mins :: [Int] -> Int
-mins = foldr min maxBound
-
-maxs :: [Int] -> Int
-maxs = foldr max minBound
-
-solve1 xs = mins $ flip deltaY xs <$> range'
-  where range' = [mins xs..maxs xs]
+solve1 xs = minimum $ flip deltaY xs <$> range'
+  where range' = [minimum xs..maximum xs]
 
 -- Part 2
 
@@ -52,8 +46,8 @@ dist2 y x = (n * (n + 1)) `div` 2
 deltaY2 :: Int -> [Int] -> Int 
 deltaY2 y = sum <$> map (dist2 y)
 
-solve2 xs = mins $ flip deltaY2 xs <$> range'
-  where range' = [mins xs..maxs xs]
+solve2 xs = minimum $ flip deltaY2 xs <$> range'
+  where range' = [minimum xs..maximum xs]
 
 {-
 >>> dist2 1 16
