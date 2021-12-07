@@ -1,4 +1,20 @@
 # --- Day 7: The Treachery of Whales ---
+
+Part1 is actually calculating the distance of crabs to the median of their position:
+"The median minimizes the sum of absolute deviations (the ℓ1 norm)"
+
+median := value in middle of distribution - ie half is smaller, half is larger than median
+
+Why? Let cost(x) = the cost at position x. Then cost(median + delta) >= cost(median) for at least half the crabs (namely those below the median) and <= for at most half the crabs (namely those above the median). So cost(median + delta) >= cost(median), with equality only if all crabs on median. Same reasoning hold for the reverse case median - delta.
+
+Part2 is close to the mean: 
+
+The mean minimizes the euclidean norm (square distance). The sum 1..n = n*(n+1)/2 which is close to n^2/2
+
+I just used brute force.
+
+## --- Part 1 ---
+
 A giant whale has decided your submarine is its next meal, and it's much faster than you are. There's nowhere to run!
 
 Suddenly, a swarm of crabs (each in its own tiny submarine - it's too deep for them otherwise) zooms in to rescue you! They seem to be preparing to blast a hole in the ocean floor; sensors indicate a massive underground cave system just beyond where they're aiming!
