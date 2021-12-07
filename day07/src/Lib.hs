@@ -44,10 +44,10 @@ solve1 xs = mins $ flip deltaY xs <$> range'
 
 -- Part 2
 
-dist2 :: (Eq p, Num p, Enum p) => p -> p -> p
-dist2 y x
-  | y == x = 0
-  | otherwise = sum [0..abs $ y - x]
+
+dist2 :: Int -> Int -> Int
+dist2 y x = (n * (n + 1)) `div` 2
+  where n = abs $ x - y
 
 deltaY2 :: Int -> [Int] -> Int 
 deltaY2 y = sum <$> map (dist2 y)
@@ -56,6 +56,9 @@ solve2 xs = mins $ flip deltaY2 xs <$> range'
   where range' = [mins xs..maxs xs]
 
 {-
+>>> dist2 1 16
+120
+
 >>> deltaY2 2 [16,1,2,0,4,2,7,1,2,14]
 206
 >>> solve1 [16,1,2,0,4,2,7,1,2,14]
