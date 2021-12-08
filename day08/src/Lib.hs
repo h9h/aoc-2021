@@ -52,52 +52,38 @@ part1 = length . concatMap (filter easyDigit)
 c      6        4  9    (count occurrence)
     8     8  7        7
 
->>> countLetter ["acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab"]
-[('a',8),('b',9),('c',7),('d',8),('e',6),('f',7),('g',4)]
-
->>> getMapping "ab" "eafb" [('a',8),('b',9),('c',7),('d',8),('e',6),('f',7),('g',4)]
+>>> getMapping ["acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab"]
 [('a','c'),('b','f'),('c','g'),('d','a'),('e','b'),('f','d'),('g','e')]
 
->>> translateChar [('a','c'),('b','f'),('c','g'),('d','a'),('e','b'),('f','d'),('g','e')] 'c'
-'g'
+>>> translate [('a','c'),('b','f'),('c','g'),('d','a'),('e','b'),('f','d'),('g','e')] "aceg"
+"bceg"
 
 >>> mapStringToDigit $ translate [('a','c'),('b','f'),('c','g'),('d','a'),('e','b'),('f','d'),('g','e')] "fbcad"
-3
+Just 3
 
 -}
 
-countLetter :: [Input] -> [(Char, Int)]
-countLetter = map (\x -> (head x, length x)) . group . sort . concat
-
 -- Die eigentlich Logik, alles andere ist nur mappen
-getMapping :: String -> String -> [(Char, Int)] -> [(Char,Char)]
-getMapping len2 len4 = map f
-  where f (c, 4) = (c, 'e')
+getMapping :: [Input] -> [(Char,Char)]
+getMapping ins = map (f . (\ x -> (head x, length x))) $ group . sort $ concat ins
+  where len2 = head $ filter ((==2) . length) ins
+        len4 = head $ filter ((==4) . length) ins
+        f (c, 4) = (c, 'e')
         f (c, 6) = (c, 'b')
         f (c, 9) = (c, 'f')
         f (c, 7) = if [c] `isInfixOf` len4 then (c, 'd') else (c, 'g')
         f (c, 8) = if [c] `isInfixOf` len2 then (c, 'c') else (c, 'a')
         f (c, _) = error "Kann nicht sein"
 
-translateChar :: [(Char, Char)] -> Char -> Char
-translateChar mapping c = snd . head . filter ((==c) . fst) $ mapping
-
 translate :: [(Char, Char)] -> String -> String
-translate mapping = sort . map (translateChar mapping)
+translate mapping = sort . map (snd . head . (\c -> filter ((==c) . fst) mapping))
 
 mapStringToDigit :: String -> Maybe Int
 mapStringToDigit = flip elemIndex codes
     where codes = ["abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg"]
 
 translateInputToPutput :: ([Input], [Output]) -> [Maybe Int]
-translateInputToPutput (ins, outs) = map (mapStringToDigit . translate mappings) outs
-    where
-          mappings = getMapping l2 l4 (countLetter ins)
-          l2 = head $ filter ((==2) . length) ins
-          l4 = head $ filter ((==4) . length) ins
-
-decodeOutput :: ([Input], [Output]) -> Int
-decodeOutput = read . concatMap (show . fromMaybe 0) <$> translateInputToPutput
+translateInputToPutput (ins, outs) = map (mapStringToDigit . translate (getMapping ins)) outs
 
 decodeOutputs :: [([Input], [Output])] -> [Int]
-decodeOutputs = map decodeOutput
+decodeOutputs = map (read . concatMap (show . fromMaybe 0) <$> translateInputToPutput)
