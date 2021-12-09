@@ -1,19 +1,21 @@
+{-# LANGUAGE TypeApplications #-}
+
 import Control.Exception (evaluate)
 import Test.Hspec
-import Test.QuickCheck
 
-import Lib ()
+import Lib ( getAllLowPoints, part1, collectBasin, part2, collectAllBasins )
 
 main :: IO ()
 main = do
-  testinput <- readFile "test/input-test.txt"
+  area <- map (map (\x -> read @Int [x])) . lines <$> readFile "test/input-test.txt"
   hspec $ do
-    describe "function" $ do
-      it "should" $ do
-        True `shouldBe` True
-    describe "QuickCheck" $ do
-      it "property" $ do
-        property prop_LengthInvariantToDirection
-
-prop_Trivial :: Int -> Int -> Bool
-prop_Trivial x y = x + y == y + x
+    describe "part 1" $ do
+      it "find all low points" $ do
+        getAllLowPoints area `shouldBe` [(0,1), (0,9), (2,2), (4,6)]
+      it "part 1 should fit" $ do
+        part1 area `shouldBe` 15
+    describe "part 2" $ do
+      it "find basin (0,0)" $ do
+        collectBasin area (0,0) `shouldBe` [(0,1), (1,0), (0,0)]
+      it "part 2 should fit" $ do
+        part2 area `shouldBe` 1134
