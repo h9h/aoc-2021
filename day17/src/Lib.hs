@@ -24,11 +24,11 @@ targetHit ((x0,x1), (y0,y1)) = any  (\((x,y), _) -> x0 <= x && x <= x1
                                                  && y0 <= y && y <= y1)
 
 path :: TargetArea -> Velocity -> Path
-path ((x0,x1), (y0,y1)) (dx, dy) = takeWhile (\((x,y), _) -> y >= y0) 
+path (_, (y0,_)) (dx, dy) = takeWhile (\((x,y), _) -> y >= y0) 
                                  $ iterate move ((0,0), (dx, dy))
 
 potentialPaths :: TargetArea -> [Path]
-potentialPaths ta@((x0,x1), (y0,y1)) = 
+potentialPaths ta@((x0,x1), (y0,_)) = 
     [ p 
     | dx <- [1..x1]
     , dx >= floor(sqrt (2.0 * fromIntegral x0))
