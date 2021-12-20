@@ -1,19 +1,23 @@
 import Control.Exception (evaluate)
-import Test.Hspec
-import Test.QuickCheck
+import Test.Hspec ( hspec, describe, it, shouldBe )
+import Test.QuickCheck ()
 
-import Lib ()
+import Data.List (nub)
+import Lib ( parseInput, overlap, alignWithReference, computeAllPositions )
 
 main :: IO ()
 main = do
-  testinput <- readFile "test/input-test.txt"
+  scanners <- parseInput <$> readFile "test/input-test.txt"
+  let s n = scanners !! n
   hspec $ do
-    describe "function" $ do
-      it "should" $ do
-        True `shouldBe` True
-    describe "QuickCheck" $ do
-      it "property" $ do
-        property prop_LengthInvariantToDirection
-
-prop_Trivial :: Int -> Int -> Bool
-prop_Trivial x y = x + y == y + x
+    describe "Overlap" $ do
+      it "no overlap (without orientations)" $ do
+        overlap (s 0) (s 1)  `shouldBe` []
+      it "does overlap with orientations 0-1" $ do
+        snd ( head $ alignWithReference (s 0) (s 1)) `shouldBe` [68,-1246,-43]
+      it "does overlap with orientations 4-1" $ do
+        snd ( head $ alignWithReference (s 1) (s 4)) `shouldBe` [88,113,-1104]
+    describe "Allignment" $ do
+      it "should be 79 beacons" $ do
+        let x:xs = scanners
+        (length . nub . concatMap fst $ computeAllPositions [(x, [0, 0, 0])] [x] xs) `shouldBe` 79
